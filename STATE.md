@@ -22,7 +22,7 @@
 | Trivial CI change proves loop | ✅ Push → CI run `42482234401` green + artifact `butter-dev-ipa` exists. |
 | gstack installed | ✅ v1.98.0.0 installed (claude host, full tier, global). Only `/cso` unavailable (PowerShell toolchain probe failed — non-critical). |
 | Claude HUD active | ✅ gstack hooks registered (timeline-stop-hook re-pointed). |
-| Codex configured as second reviewer | ✅ Codex CLI installed (0.167.0, `npm install -g @openai/codex`). ⏳ `codex login` pending — user must run it interactively (browser auth). |
+| Codex configured as second reviewer | ✅ Codex CLI 0.167.0 installed + logged in (ChatGPT account, no subscription — usage limits may apply). |
 
 ## Done this session
 
@@ -39,14 +39,14 @@
 
 ## Open issues / blockers
 
-1. **`codex login`** — user must run it interactively (browser auth) before Codex
-   can act as second reviewer. Not blocking Gate 0 approval.
+1. **Codex usage limits** — user logged in with a ChatGPT account without a
+   subscription; reviews may hit free-tier limits. The `/codex` skill will surface
+   this when run. Not blocking.
 2. **settings.json permissions merge** — user action, pending (see below).
 
 ## Next queued task
 
-1. **User:** run `codex login` (browser auth) to complete the second-reviewer setup.
-2. **User:** merge permissions block into ~/.claude/settings.json (strict JSON).
-3. Run `/office-hours` with the framing: "offline-first free iOS music player built
+1. **User:** merge permissions block into ~/.claude/settings.json (strict JSON).
+2. Run `/office-hours` with the framing: "offline-first free iOS music player built
    from Reddit complaints — no ads, no accounts, FLAC support, Wi-Fi transfer from PC"
-4. Gate 0 approval ("GATE 0 APPROVED") → then Gate 1 (audio engine)
+3. Gate 0 approval ("GATE 0 APPROVED") → then Gate 1 (audio engine)
