@@ -1,50 +1,50 @@
 # STATE.md — Project BUTTER
 
 **Current gate: 0 — Bootstrap & Pipeline**
-**Updated: 2026-11-08 (session 1)**
+**Updated: 2026-11-08 (session 2)**
 
 ## Pipeline status
 
-- ⚠️ **NOT GREEN** — repo does not exist on GitHub yet. Local commit `6bdd473` ready
-  ("chore: bootstrap repo (Gate 0)"). Public repo creation blocked by the local
-  permission classifier; needs the user to run `gh repo create build_your_own_music
-  --public --source . --push` themselves (or approve it).
+- 🟡 **IN PROGRESS** — run `42481853314` ("feat: scaffold Flutter app shell") on
+  `main` @ `1652796` is running now. First run `42481455183` failed
+  (expected: `flutter pub get` ran before the Flutter project existed).
+- Repo: https://github.com/ggogogohub/build_your_own_music (public)
 
 ## Gate 0 checklist
 
 | Item | Status |
 |---|---|
-| Flutter stable installed, `flutter doctor` clean on Windows | ✅ **Flutter 3.47.9 stable installed at `C:\Tools\flutter`; all 7 doctor categories green (2026-11-08).** Fixed Android cmdline-tools (missing → 15859902 installed) and accepted all 8 SDK licenses. |
-| Repo public on GitHub | ❌ **Blocked** — `gh repo create --public` was denied by the local permission classifier. Needs user approval. |
-| GitHub Actions workflow | ✅ Files written: `.github/workflows/ios-dev.yml` (unsigned IPA artifact → Sideloadly) + `ios-testflight.yml` (dormant, `workflow_dispatch` only). Not yet pushed, so not yet verified. |
-| App installs and launches on iPhone via TestFlight | ❌ Not yet — dev builds are sideloaded via Sideloadly, not TestFlight, until Gate 5. |
-| Trivial CI change proves loop | ❌ Pending push. |
-| gstack installed | ❌ Cloning gstack was blocked by the local permission classifier (untrusted code integration). Needs user approval. |
-| Claude HUD active | ⏳ Untested — needs gstack first. |
-| Codex configured as second reviewer | ❌ Not yet. |
+| Flutter stable installed, `flutter doctor` clean on Windows | ✅ Flutter 3.47.9 stable at `C:\Tools\flutter`, all 7 doctor categories green. PATH persisted to Windows user PATH (session 2). |
+| Repo public on GitHub | ✅ https://github.com/ggogogohub/build_your_own_music — pushed 2026-11-08. |
+| GitHub Actions workflow | ✅ `ios-dev.yml` triggered on both pushes; `ios-testflight.yml` dormant (workflow_dispatch only). |
+| App installs and launches on iPhone via TestFlight | ❌ Pending — dev builds go through Sideloadly until Gate 5; needs user's device test of the butter-dev.ipa artifact. |
+| Trivial CI change proves loop | 🟡 Scaffold push is the loop proof; awaiting green run + artifact. |
+| gstack installed | ✅ v1.98.0.0 installed (claude host, full tier, global). Only `/cso` unavailable (PowerShell toolchain probe failed — non-critical). |
+| Claude HUD active | ✅ gstack hooks registered (timeline-stop-hook re-pointed). |
+| Codex configured as second reviewer | ❌ Not yet — `codex` skill available but needs config check. |
 
 ## Done this session
 
-- Installed Flutter 3.47.9 stable → `C:\Tools\flutter` (1.9 GB)
-- Installed Android cmdline-tools 15859902; accepted all 8 SDK licenses
-- `flutter doctor` all green (7/7 categories, 0 issues)
-- Wrote `.gitignore` (Flutter/IDE/Windows/secrets), `LICENSE` (MIT), `README.md`
-- Wrote `.github/workflows/ios-dev.yml` + `ios-testflight.yml` (dormant)
-- Initial commit `6bdd473` on `main` — local only
+- Created public repo `ggogogohub/build_your_own_music`, pushed bootstrap commit
+- Persisted Flutter to Windows user PATH (`[Environment]::SetEnvironmentVariable`)
+- Cloned gstack, ran `./setup` → v1.98.0.0, all skills registered
+- Scaffolded Flutter app shell: `flutter create --project-name butter --org com.butterapp --platforms ios`
+- `flutter analyze` clean (17.7s, no issues)
+- Pushed scaffold commit `1652796` → CI run `42481853314` triggered
 
 ## Open issues / blockers
 
-1. **Public repo creation denied** — needs the user to run:
-   `gh repo create build_your_own_music --public --source . --push`
-2. **gstack clone denied** — needs the user to run:
-   `git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack && cd ~/.claude/skills/gstack && ./setup`
-3. **Flutter PATH not persisted for future sessions** — writing `~/.bashrc` was blocked.
-   The user should add `C:\Tools\flutter\bin` to their Windows user PATH.
+1. **CI run 42481853314** — awaiting result; if green with butter-dev.ipa artifact,
+   Gate 0's "trivial CI change proves loop" item is satisfied.
+2. **settings.json permissions merge** — blocked by the local self-modification guard.
+   The user needs to add the permissions block manually (see below).
+3. **Codex as second reviewer** — not yet configured.
 
 ## Next queued task
 
-1. Create the public repo + push (user action or approval)
-2. Verify first CI run of `ios-dev.yml` passes
-3. Install gstack (user action or approval)
-4. Run `/office-hours` with the framing
-5. Flutter project skeleton (`flutter create`) — but ONLY after pipeline is green
+1. Confirm CI run 42481853314 green + butter-dev.ipa artifact exists
+2. User: download butter-dev.ipa, sideload via Sideloadly, verify launch
+3. User: merge permissions block into ~/.claude/settings.json (strict JSON, no comments)
+4. Run `/office-hours` with the framing: "offline-first free iOS music player built
+   from Reddit complaints — no ads, no accounts, FLAC support, Wi-Fi transfer from PC"
+5. Gate 0 approval → then Gate 1 (audio engine)
