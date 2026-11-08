@@ -1,0 +1,44 @@
+name: iOS TestFlight
+
+on:
+  # DORMANT until Gate 5. Do not enable before Apple Developer enrollment.
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "GATE 5 APPROVED" to enable'
+        required: true
+
+jobs:
+  upload:
+    runs-on: macos-latest
+    if: ${{ github.event.inputs.confirm == 'GATE 5 APPROVED' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.9'
+          channel: stable
+
+      - name: Pub get
+        run: flutter pub get
+
+      - name: Build signed IPA
+        run: flutter build ipa --release
+        env:
+          # Signing credentials configured as repo secrets at Gate 5
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_KEY_CONTENT: ${{ secrets.APPLE_KEY_CONTENT }}
+
+      - name: Upload to TestFlight
+        run: |
+          xcrun altool --upload-app --type ios \
+            --file build/ios/ipa/*.ipa \
+            --apiKey "$APPLE_KEY_ID" \
+            --apiIssuer "$APPLE_ISSUER_ID"
+        env:
+          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
+          APPLE_ISSUER_ID: ${{ secrets.APPLE_ISSUER_ID }}
