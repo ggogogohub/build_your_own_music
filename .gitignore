@@ -37,3 +37,6 @@ key.properties
 *.ipa
 *.dSYM.zip
 fastlane/report.xml
+
+# gstack local state (restore points, tmp)
+.gstack/

@@ -44,9 +44,19 @@
    this when run. Not blocking.
 2. **settings.json permissions merge** — user action, pending (see below).
 
+## Standing action items
+
+1. **Q5 observation (office-hours finding):** Watch 1 real person move music from
+   their PC to their phone before Gate 2 ships. The transfer workflow is the wedge
+   and it is the least observed part of the product — you are the only user so far,
+   and your own Sideloadly friction is normalized.
+2. **Accepted risk (premise 5):** Sideloadly-only distribution through Gates 0-2
+   means months of zero external users; $99 Developer Program enrollment deferred
+   to Gate 5. Second opinion flagged this Critical. Defended: $99 is spent only
+   when the wedge is validated.
+
 ## Next queued task
 
 1. **User:** merge permissions block into ~/.claude/settings.json (strict JSON).
-2. Run `/office-hours` with the framing: "offline-first free iOS music player built
-   from Reddit complaints — no ads, no accounts, FLAC support, Wi-Fi transfer from PC"
+2. Office-hours: Phase 4 alternatives generation (in progress).
 3. Gate 0 approval ("GATE 0 APPROVED") → then Gate 1 (audio engine)
