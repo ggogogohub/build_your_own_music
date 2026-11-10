@@ -1,62 +1,67 @@
 # STATE.md — Project BUTTER
 
-**Current gate: 0 — Bootstrap & Pipeline**
-**Updated: 2026-11-08 (session 2)**
+**Current gate: 1 — Audio Engine**
+**Updated: 2026-11-10 (session 3)**
 
 ## Pipeline status
 
-- 🟢 **GREEN** — run `42482234401` ("fix: track ios/ directory in git") on
-  `main` @ `9510049` passed. **Artifact `butter-dev-ipa` exists (6,188,057 bytes).**
-  - Run `42481455183` failed (expected: `flutter pub get` ran before the Flutter project existed).
-  - Run `42481853314` failed (root cause: `.gitignore` was written for an XcodeGen setup, but flutter create generates the ios/ folder as the canonical structure — it must be tracked).
+- 🟢 **GREEN** — run `42725127129` ("feat(gate-1): audio engine — just_audio +
+  just_audio_background") on `main` @ `bbc6f69` passed. First build with native
+  plugins (just_audio Objective-C); `butter-dev-ipa` artifact exists.
 - Repo: https://github.com/ggogogohub/build_your_own_music (public)
 
-## Gate 0 checklist
+## Gate 1 checklist (audio engine)
 
 | Item | Status |
 |---|---|
-| Flutter stable installed, `flutter doctor` clean on Windows | ✅ Flutter 3.47.9 stable at `C:\Tools\flutter`, all 7 doctor categories green. PATH persisted to Windows user PATH (session 2). |
-| Repo public on GitHub | ✅ https://github.com/ggogogohub/build_your_own_music — pushed 2026-11-08. |
-| GitHub Actions workflow | ✅ `ios-dev.yml` triggered on all pushes; `ios-testflight.yml` dormant (workflow_dispatch only). |
-| App installs and launches on iPhone via TestFlight | ✅ **Device test PASSED (2026-11-08)** — user sideloaded `butter-dev.ipa` from run `42482234401` via Sideloadly, enabled Developer Mode, app launched on iPhone. Flutter counter demo works (plus button, count increments). |
-| Trivial CI change proves loop | ✅ Push → CI run `42482234401` green + artifact `butter-dev-ipa` exists. |
-| gstack installed | ✅ v1.98.0.0 installed (claude host, full tier, global). Only `/cso` unavailable (PowerShell toolchain probe failed — non-critical). |
-| Claude HUD active | ✅ gstack hooks registered (timeline-stop-hook re-pointed). |
-| Codex configured as second reviewer | ✅ Codex CLI 0.167.0 installed + logged in (ChatGPT account, no subscription — usage limits may apply). |
+| just_audio + audio_service integrated: play, pause, seek, skip | ✅ Code written — `AudioEngine` singleton (just_audio 0.10.6 + just_audio_background 0.0.1-beta.17, which wraps audio_service). play/pause/seek/skipToNext/skipToPrevious/skipTo/shuffle/repeat. Unit tests pass. |
+| Background playback survives 10 min locked screen | ⏳ Awaiting device test (next build). `UIBackgroundModes: audio` added to Info.plist. |
+| Lock screen + Control Center controls | ⏳ Awaiting device test. MediaItem tags (title/artist/album/artUri) wired in `Track.toAudioSource()`. |
+| Interruption handling | ⏳ Awaiting device test. `handleInterruptions: true` (auto-pause on call, auto-resume after). |
+| Battery drain < 5%/hr | ⏳ Awaiting device test. |
+| Formats MP3/FLAC/ALAC/WAV | ⏳ Awaiting device test. Bundled clips are AAC so far; Gate 2 import will verify MP3/FLAC/ALAC/WAV. |
+| Gapless between tracks | ⏳ Awaiting device test. `setAudioSources` playlist API. |
 
 ## Done this session
 
-- Created public repo `ggogogohub/build_your_own_music`, pushed bootstrap commit
-- Persisted Flutter to Windows user PATH (`[Environment]::SetEnvironmentVariable`)
-- Cloned gstack, ran `./setup` → v1.98.0.0, all skills registered
-- Scaffolded Flutter app shell: `flutter create --project-name butter --org com.butterapp --platforms ios`
-- `flutter analyze` clean (17.7s, no issues)
-- Pushed scaffold commit `1652796` → CI run `42481853314` (failed: ios/ was gitignored)
-- Fixed `.gitignore` to track ios/ → commit `9510049` → CI run `42482234401` **GREEN** with `butter-dev-ipa` artifact (6.2 MB)
-- **Device test PASSED**: user sideloaded butter-dev.ipa via Sideloadly, enabled
-  Developer Mode, app launched on iPhone, counter demo works.
-- Installed OpenAI Codex CLI 0.167.0 (`npm install -g @openai/codex`)
+- Added just_audio ^0.10.6 + just_audio_background ^0.0.1-beta.17 + path_provider.
+- `AudioEngine` singleton (`lib/core/audio/audio_engine.dart`): play/pause/seek/skip,
+  shuffle/repeat, queue management, streams for UI. `maxSkipsOnError: 3`.
+- `Track` model + `toAudioSource()` → file URI + MediaItem tag (lock-screen metadata).
+- `TestQueue` fixture: 6 bundled 30s AAC sine tones (330–880 Hz) in `assets/audio/test/`,
+  copied to a temp dir at load so the engine plays them as local files.
+- `UIBackgroundModes: audio` added to `ios/Runner/Info.plist`.
+- Engine probe screen in `lib/main.dart` (temporary harness — replaced by Gate 3 UI).
+- Removed default widget_test.dart (referenced deleted MyApp counter).
+- `flutter analyze` clean, `flutter test` 3/3 pass.
+- Committed `bbc6f69` and pushed; CI run `42725127129` **GREEN** with `butter-dev-ipa`.
+- Device test script written: `docs/gate-1-device-test.md` (transport, gapless,
+  lock screen/Control Center + 10-min locked playback, phone-call interruption,
+  battery drain).
 
 ## Open issues / blockers
 
-1. **Codex usage limits** — user logged in with a ChatGPT account without a
-   subscription; reviews may hit free-tier limits. The `/codex` skill will surface
-   this when run. Not blocking.
-2. **settings.json permissions merge** — user action, pending (see below).
+1. **Codex usage limits** — user logged in with a free ChatGPT account; Claude subagent
+   stands in for second review until Gate 5 (sanctioned by the design doc).
+2. **settings.json permissions merge** — user action, pending.
+3. **Stray folder** — `C:\Users\mahakaal\Documents\build_your_music` (mistyped path,
+   one file inside; user approved deletion but the classifier blocked it; harmless,
+   can be deleted manually).
 
 ## Standing action items
 
-1. **Q5 observation (office-hours finding):** Watch 1 real person move music from
-   their PC to their phone before Gate 2 ships. The transfer workflow is the wedge
-   and it is the least observed part of the product — you are the only user so far,
-   and your own Sideloadly friction is normalized.
-2. **Accepted risk (premise 5):** Sideloadly-only distribution through Gates 0-2
-   means months of zero external users; $99 Developer Program enrollment deferred
-   to Gate 5. Second opinion flagged this Critical. Defended: $99 is spent only
-   when the wedge is validated.
+1. **Q5 observation (office-hours finding):** watch 1 real person move music from
+   their PC to their phone before Gate 2 ships.
+2. **48-hour wedge probe** preserved as an optional accelerant if Gate 2 stalls
+   (trigger: 2027-01-03 slip past 2026-12-20 baseline).
 
 ## Next queued task
 
-1. **User:** merge permissions block into ~/.claude/settings.json (strict JSON).
-2. Office-hours: Phase 4 alternatives generation (in progress).
-3. Gate 0 approval ("GATE 0 APPROVED") → then Gate 1 (audio engine)
+1. **User:** sideload `butter-dev-ipa` from run `42725127129` via Sideloadly, run
+   the device test script (`docs/gate-1-device-test.md`):
+   - Play/pause/seek/skip with the 6 test tones (audible pitch steps).
+   - Lock screen: controls visible, artwork shown, 10 min locked playback.
+   - Control Center: remote commands work.
+   - Phone call interruption: pauses, resumes after.
+   - Battery: <5%/hr during playback.
+2. **User:** reply "GATE 1 APPROVED" when all items pass → Gate 2 (library & import).
